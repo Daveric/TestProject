@@ -29,20 +29,20 @@ namespace WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            //services.AddIdentity<User, IdentityRole>(cfg =>
-            //    {
-            //        cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
-            //        cfg.SignIn.RequireConfirmedEmail = true;
-            //        cfg.User.RequireUniqueEmail = true;
-            //        cfg.Password.RequireDigit = false;
-            //        cfg.Password.RequiredUniqueChars = 0;
-            //        cfg.Password.RequireLowercase = false;
-            //        cfg.Password.RequireNonAlphanumeric = false;
-            //        cfg.Password.RequireUppercase = false;
-            //        cfg.Password.RequiredLength = 6;
-            //    })
-            //    .AddDefaultTokenProviders()
-            //    .AddEntityFrameworkStores<DataContext>();
+            services.AddIdentity<User, IdentityRole>(cfg =>
+                {
+                    cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                    cfg.SignIn.RequireConfirmedEmail = true;
+                    cfg.User.RequireUniqueEmail = true;
+                    cfg.Password.RequireDigit = true;
+                    cfg.Password.RequiredUniqueChars = 0;
+                    cfg.Password.RequireLowercase = true;
+                    cfg.Password.RequireNonAlphanumeric = false;
+                    cfg.Password.RequireUppercase = true;
+                    cfg.Password.RequiredLength = 6;
+                })
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<DataContext>();
 
             //services.AddAuthentication()
             //    .AddCookie()
@@ -60,6 +60,7 @@ namespace WebAPI
             services.AddDbContext<DataContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<SeedDb>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
+            services.AddScoped<IUserHelper, UserHelper>();
             
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -89,9 +90,9 @@ namespace WebAPI
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseCookiePolicy();
+            app.UseAuthentication();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

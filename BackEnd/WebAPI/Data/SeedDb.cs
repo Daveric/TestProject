@@ -11,30 +11,40 @@ namespace WebAPI.Data
     public class SeedDb
     {
         private readonly DataContext _context;
-        //private readonly IUserHelper _userHelper;
+        private readonly IUserHelper _userHelper;
 
-        public SeedDb(DataContext context)
+        public SeedDb(DataContext context, IUserHelper userHelper)
         {
             _context = context;
-            //_userHelper = userHelper;
+            _userHelper = userHelper;
         }
 
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
 
-            //await CheckRolesAsync();
+            var user = await _userHelper.GetUserByEmailAsync("emaldonado@itworks.ec");
+            if (user == null)
+            {
+                user = new User
+                {
+                    DisplayName = "Daverick",
+                    Email = "emaldonado@itworks.ec",
+                    UserName = "emaldonado@itworks.ec"
+                };
 
-            //await this.CheckUser("brad@gmail.com", "Brad", "Customer");
-            //await this.CheckUser("angelina@gmail.com", "Angelina", "Customer");
-            //var user = await this.CheckUser("jzuluaga55@gmail.com", "Juan", "Admin");
-
+                var result = await _userHelper.AddUserAsync(user, "Pwd1234");
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
+            }
 
             if (!_context.Applications.Any())
             {
-                AddApplication("Cambium 2021.07");
-                AddApplication("Cambium 2021.01");
-                AddApplication("Cambium 2021.04");
+                AddApplication("Cambium 2021.07", user);
+                AddApplication("Cambium 2021.01", user);
+                AddApplication("Cambium 2021.04", user);
                 await _context.SaveChangesAsync();
             }
         }
@@ -84,12 +94,13 @@ namespace WebAPI.Data
         //    await _userHelper.CheckRoleAsync("Customer");
         //}
 
-        private void AddApplication(string name)
+        private void AddApplication(string name, User user)
         {
             _context.Applications.Add(new Application
             {
                 Name = name,
-                AppId = Guid.NewGuid()
+                AppId = Guid.NewGuid(),
+                User = user
             });
         }
     }

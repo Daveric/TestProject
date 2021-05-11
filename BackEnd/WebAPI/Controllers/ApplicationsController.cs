@@ -1,25 +1,30 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Data.Entities;
+using WebAPI.Data.Repositories;
+using WebAPI.Helper;
 
 namespace WebAPI.Controllers
 {
     public class ApplicationsController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IApplicationRepository _applicationRepository;
+        private readonly IUserHelper _userHelper;
 
-        public ApplicationsController(DataContext context)
+        public ApplicationsController(IApplicationRepository applicationRepository, IUserHelper userHelper)
         {
-            _context = context;
+            _applicationRepository = applicationRepository;
+            _userHelper = userHelper;
         }
 
         // GET: Applications
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Applications.ToListAsync());
+            return View( _applicationRepository.GetAll().OrderBy(a=>a.Name));
         }
 
         // GET: Applications/Details/5
@@ -30,8 +35,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var application = await _context.Applications
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
                 return NotFound();
@@ -41,6 +45,7 @@ namespace WebAPI.Controllers
         }
 
         // GET: Applications/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -55,14 +60,15 @@ namespace WebAPI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(application);
-                await _context.SaveChangesAsync();
+                application.User = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                await _applicationRepository.CreateAsync(application);
                 return RedirectToAction(nameof(Index));
             }
             return View(application);
         }
 
         // GET: Applications/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -70,7 +76,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var application = await _context.Applications.FindAsync(id);
+            var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
                 return NotFound();
@@ -94,12 +100,12 @@ namespace WebAPI.Controllers
             {
                 try
                 {
-                    _context.Update(application);
-                    await _context.SaveChangesAsync();
+                    application.User = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                    await _applicationRepository.UpdateAsync(application);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ApplicationExists(application.Id))
+                    if (!await _applicationRepository.ExistAsync(application.Id))
                     {
                         return NotFound();
                     }
@@ -114,6 +120,7 @@ namespace WebAPI.Controllers
         }
 
         // GET: Applications/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -121,8 +128,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var application = await _context.Applications
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
                 return NotFound();
@@ -136,15 +142,10 @@ namespace WebAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var application = await _context.Applications.FindAsync(id);
-            _context.Applications.Remove(application);
-            await _context.SaveChangesAsync();
+            var application = await _applicationRepository.GetByIdAsync(id);
+            await _applicationRepository.DeleteAsync(application);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ApplicationExists(int id)
-        {
-            return _context.Applications.Any(e => e.Id == id);
-        }
     }
 }

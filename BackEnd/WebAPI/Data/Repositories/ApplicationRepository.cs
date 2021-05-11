@@ -1,4 +1,5 @@
 ﻿
+
 namespace WebAPI.Data.Repositories
 {
     using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace WebAPI.Data.Repositories
             return _context.Applications.Include(app => app.User);
         }
 
-        public IEnumerable<SelectListItem> GetComboApplication()
+        public IEnumerable<SelectListItem> GetComboApplications()
         {
             var list = _context.Applications.Select(p => new SelectListItem
             {
@@ -37,5 +38,6 @@ namespace WebAPI.Data.Repositories
 
             return list;
         }
+
     }
 }
