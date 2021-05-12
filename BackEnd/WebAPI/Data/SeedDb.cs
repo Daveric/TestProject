@@ -23,14 +23,18 @@ namespace WebAPI.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
+            await CheckRolesAsync();
+
             var user = await _userHelper.GetUserByEmailAsync("emaldonado@itworks.ec");
             if (user == null)
             {
                 user = new User
                 {
-                    DisplayName = "Daverick",
+                    FirstName = "Erick",
+                    LastName = "Maldonado",
                     Email = "emaldonado@itworks.ec",
-                    UserName = "emaldonado@itworks.ec"
+                    UserName = "emaldonado@itworks.ec",
+                    PhoneNumber = "0992627258"
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "Pwd1234");
@@ -42,57 +46,53 @@ namespace WebAPI.Data
 
             if (!_context.Applications.Any())
             {
-                AddApplication("Cambium 2021.07", user);
-                AddApplication("Cambium 2021.01", user);
-                AddApplication("Cambium 2021.04", user);
+                AddApplication("Cambium", user);
                 await _context.SaveChangesAsync();
             }
         }
 
-        //private async Task<User> CheckUser(string userName, string displayName, string role)
-        //{
-        //    // Add user
-        //    var user = await _userHelper.GetUserByEmailAsync(userName);
-        //    if (user == null)
-        //    {
-        //        user = await AddUser(userName, displayName, role);
-        //    }
+        private async Task<User> CheckUser(string userName, string firstName, string lastName, string role)
+        {
+            // Add user
+            var user = await _userHelper.GetUserByEmailAsync(userName) ?? await AddUser(userName, firstName, lastName, role);
 
-        //    var isInRole = await _userHelper.IsUserInRoleAsync(user, role);
-        //    if (!isInRole)
-        //    {
-        //        await _userHelper.AddUserToRoleAsync(user, role);
-        //    }
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, role);
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, role);
+            }
 
-        //    return user;
-        //}
+            return user;
+        }
 
-        //private async Task<User> AddUser(string userName, string displayName, string role)
-        //{
-        //    var user = new User
-        //    {
-        //        DisplayName = displayName,
-        //        Email = userName,
-        //        PhoneNumber = "350 634 2747"
-        //    };
+        private async Task<User> AddUser(string userName, string firstName, string lastName, string role)
+        {
+            var user = new User
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = userName,
+                Address = "Quito",
+                PhoneNumber = "0992627258"
+            };
 
-        //    var result = await _userHelper.AddUserAsync(user, "123456");
-        //    if (result != IdentityResult.Success)
-        //    {
-        //        throw new InvalidOperationException("Could not create the user in seeder");
-        //    }
+            var result = await _userHelper.AddUserAsync(user, "Pwd1234");
+            if (result != IdentityResult.Success)
+            {
+                throw new InvalidOperationException("Could not create the user in seeder");
+            }
 
-        //    await this._userHelper.AddUserToRoleAsync(user, role);
-        //    var token = await this._userHelper.GenerateEmailConfirmationTokenAsync(user);
-        //    await this._userHelper.ConfirmEmailAsync(user, token);
-        //    return user;
-        //}
+            await this._userHelper.AddUserToRoleAsync(user, role);
+            var token = await this._userHelper.GenerateEmailConfirmationTokenAsync(user);
+            await this._userHelper.ConfirmEmailAsync(user, token);
+            return user;
+        }
 
-        //private async Task CheckRolesAsync()
-        //{
-        //    await _userHelper.CheckRoleAsync("Admin");
-        //    await _userHelper.CheckRoleAsync("Customer");
-        //}
+        private async Task CheckRolesAsync()
+        {
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Customer");
+        }
 
         private void AddApplication(string name, User user)
         {

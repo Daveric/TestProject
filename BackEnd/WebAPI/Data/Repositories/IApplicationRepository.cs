@@ -1,4 +1,5 @@
 ﻿
+using System;
 using WebAPI.Helper;
 
 namespace WebAPI.Data.Repositories
@@ -10,8 +11,9 @@ namespace WebAPI.Data.Repositories
 
     public interface IApplicationRepository : IGenericRepository<Application>
     {
-        IQueryable GetAllWithUsers();
-        
-        IEnumerable<SelectListItem> GetComboApplications();
+        bool GetApplicationAccessToUser(string name);
+
+        Guid GetGuidByApplicationName(string name);
+
     }
 }

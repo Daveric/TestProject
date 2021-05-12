@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="TestApp" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="TestApp" Height="450" Width="800" >
     <Grid Background="Azure">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.5*"/>

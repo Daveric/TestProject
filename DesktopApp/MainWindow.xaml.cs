@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using QRCoder;
+using RestSharp;
+using RestSharp.Serialization.Json;
 
 namespace DesktopApp
 {
@@ -10,7 +14,9 @@ namespace DesktopApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string Id = "1B7CA586-EB7D-4BFF-BAF7-BC1D0FC67FD5";
+        private const string ApplicationName = "Cambium 2021.07";
+        private static readonly RestClient Client = new RestClient(new Uri("https://localhost:44315/api/"));
+
         public MainWindow()
         {
             InitializeComponent();
@@ -18,27 +24,49 @@ namespace DesktopApp
 
         private void ShowQrCode_OnClick(object sender, RoutedEventArgs e)
         {
+            InfoText.Text += "Status: Guid Loaded\n";
             using var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(Id, QRCodeGenerator.ECCLevel.Q);
-            
+            var qrCodeData = qrGenerator.CreateQrCode(Load_Guid(), QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrCodeData);
             var qrCodeAsPng = qrCode.GetGraphic(20);
             QrCodeImage.Source = ToImage(qrCodeAsPng);
+            InfoText.Text += ResponseFromApi();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private static string ResponseFromApi()
         {
+            var request = new RestRequest("Applications/GetAccess", Method.GET);
+            request.AddQueryParameter("name", ApplicationName);
+            var response = Client.Execute(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                return string.Empty;
 
+
+            var jsonSerializer = new JsonSerializer();
+            return jsonSerializer.Deserialize<bool>(response) ? "Unlocked" : "User has not the permissions";
         }
+
+        private static string Load_Guid()
+        {
+            var request = new RestRequest("Applications/GetAppId", Method.GET);
+            request.AddQueryParameter("name", ApplicationName);
+            var response = Client.Execute(request);
+            if (response.StatusCode != HttpStatusCode.OK) 
+                return Guid.NewGuid().ToString();
+            var jsonSerializer = new JsonSerializer();
+            return jsonSerializer.Deserialize<Guid>(response).ToString();
+        }
+        
         private static BitmapImage ToImage(byte[] array)
         {
             using var ms = new MemoryStream(array);
             var image = new BitmapImage();
             image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // here
+            image.CacheOption = BitmapCacheOption.OnLoad; 
             image.StreamSource = ms;
             image.EndInit();
             return image;
         }
+
     }
 }

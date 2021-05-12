@@ -1,12 +1,12 @@
 ﻿
 
+using System;
+using System.Threading.Tasks;
+
 namespace WebAPI.Data.Repositories
 {
-    using System.Collections.Generic;
     using System.Linq;
     using Entities;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
 
     public class ApplicationRepository : GenericRepository<Application>, IApplicationRepository
     {
@@ -17,26 +17,20 @@ namespace WebAPI.Data.Repositories
             _context = context;
         }
 
-        public IQueryable GetAllWithUsers()
+        public bool GetApplicationAccessToUser(string name)
         {
-            return _context.Applications.Include(app => app.User);
+            var userIsAdmin = _context.Applications?.AsQueryable().FirstOrDefault(a => a.Name == name)?.User.IsAdmin;
+            return userIsAdmin != null && (bool) userIsAdmin;
         }
 
-        public IEnumerable<SelectListItem> GetComboApplications()
+
+        public Guid GetGuidByApplicationName(string name)
         {
-            var list = _context.Applications.Select(p => new SelectListItem
-            {
-                Text = p.Name,
-                Value = p.Id.ToString()
-            }).ToList();
+            var appId = _context.Applications?.AsQueryable().FirstOrDefault(a => a.Name == name)?.AppId;
+            if (appId != null)
+                return (Guid) appId;
 
-            list.Insert(0, new SelectListItem
-            {
-                Text = "(Select an application...)",
-                Value = "0"
-            });
-
-            return list;
+            return default;
         }
 
     }

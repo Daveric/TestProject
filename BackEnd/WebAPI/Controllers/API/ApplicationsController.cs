@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿#nullable enable
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Models;
+using MvvmCross.Binding.Extensions;
 using WebAPI.Data.Repositories;
 using WebAPI.Helper;
 
@@ -20,10 +24,23 @@ namespace WebAPI.Controllers.API
             _applicationRepository = applicationRepository;
         }
 
-        [HttpGet]
-        public IActionResult GetApplications(Guid id)
+        [HttpGet("[action]")]
+        public IActionResult GetAppId([FromQuery]string name)
         {
-            return Ok(_applicationRepository.GetAll().First(app => app.AppId == id));
+            return Ok(_applicationRepository.GetGuidByApplicationName(name));
         }
+
+        [HttpGet("[action]")]
+        public IActionResult GetAccess([FromQuery] string name)
+        {
+            return Ok(_applicationRepository.GetApplicationAccessToUser(name));
+        }
+        
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            return Ok(_applicationRepository.GetAll());
+        }
+
     }
 }

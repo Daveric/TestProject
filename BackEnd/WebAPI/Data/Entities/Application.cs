@@ -7,10 +7,10 @@ namespace WebAPI.Data.Entities
     {
         public int Id { get; set; }
 
-        [MaxLength(60)]
-        [Required]
+        [MaxLength(50)]
         public string Name { get; set; }
 
+        [Required]
         public Guid AppId { get; set; }
 
         public User User { get; set; }
