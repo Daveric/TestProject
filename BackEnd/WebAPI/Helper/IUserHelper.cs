@@ -25,6 +25,8 @@ namespace WebAPI.Helper
 
         Task CheckRoleAsync(string roleName);
 
+        Task DeleteRoleAsync(string roleName);
+
         Task AddUserToRoleAsync(User user, string roleName);
 
         Task<bool> IsUserInRoleAsync(User user, string roleName);

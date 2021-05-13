@@ -25,28 +25,14 @@ namespace WebAPI.Data
 
             await CheckRolesAsync();
 
-            var user = await _userHelper.GetUserByEmailAsync("emaldonado@itworks.ec");
-            if (user == null)
-            {
-                user = new User
-                {
-                    FirstName = "Erick",
-                    LastName = "Maldonado",
-                    Email = "emaldonado@itworks.ec",
-                    UserName = "emaldonado@itworks.ec",
-                    PhoneNumber = "0992627258"
-                };
-
-                var result = await _userHelper.AddUserAsync(user, "Pwd1234");
-                if (result != IdentityResult.Success)
-                {
-                    throw new InvalidOperationException("Could not create the user in seeder");
-                }
-            }
+            await CheckUser("erickdavid17@outlook.com", "David", "Loayza", "ThirdAuthLevel");
+            var user = await CheckUser("emaldonado@itworks.ec", "Erick", "Maldonado", "Admin");
 
             if (!_context.Applications.Any())
             {
-                AddApplication("Cambium", user);
+                AddApplication("Cambium1", user);
+                AddApplication("Cambium2", user);
+                AddApplication("Cambium3", user);
                 await _context.SaveChangesAsync();
             }
         }
@@ -72,8 +58,8 @@ namespace WebAPI.Data
                 FirstName = firstName,
                 LastName = lastName,
                 Email = userName,
-                Address = "Quito",
-                PhoneNumber = "0992627258"
+                UserName = userName,
+                Address = "Quito"
             };
 
             var result = await _userHelper.AddUserAsync(user, "Pwd1234");
@@ -82,16 +68,16 @@ namespace WebAPI.Data
                 throw new InvalidOperationException("Could not create the user in seeder");
             }
 
-            await this._userHelper.AddUserToRoleAsync(user, role);
-            var token = await this._userHelper.GenerateEmailConfirmationTokenAsync(user);
-            await this._userHelper.ConfirmEmailAsync(user, token);
+            await _userHelper.AddUserToRoleAsync(user, role);
+            var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            await _userHelper.ConfirmEmailAsync(user, token);
             return user;
         }
 
         private async Task CheckRolesAsync()
         {
             await _userHelper.CheckRoleAsync("Admin");
-            await _userHelper.CheckRoleAsync("Customer");
+            await _userHelper.CheckRoleAsync("ThirdAuthLevel");
         }
 
         private void AddApplication(string name, User user)

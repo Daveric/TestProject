@@ -13,13 +13,13 @@ namespace WebAPI.Controllers.API
     [Route("api/[Controller]")]
     public class AccountController : Controller
     {
-        private readonly IUserHelper userHelper;
-        private readonly IMailHelper mailHelper;
+        private readonly IUserHelper _userHelper;
+        private readonly IMailHelper _mailHelper;
 
         public AccountController(IUserHelper userHelper, IMailHelper mailHelper)
         {
-            this.userHelper = userHelper;
-            this.mailHelper = mailHelper;
+            _userHelper = userHelper;
+            _mailHelper = mailHelper;
         }
 
         [HttpPost]
@@ -27,17 +27,17 @@ namespace WebAPI.Controllers.API
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "Bad request"
                 });
             }
 
-            var user = await this.userHelper.GetUserByEmailAsync(request.Email);
+            var user = await _userHelper.GetUserByEmailAsync(request.Email);
             if (user != null)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "This email is already registered."
@@ -54,27 +54,27 @@ namespace WebAPI.Controllers.API
                 PhoneNumber = request.Phone
             };
 
-            var result = await userHelper.AddUserAsync(user, request.Password);
+            var result = await _userHelper.AddUserAsync(user, request.Password);
             if (result != IdentityResult.Success)
             {
-                return this.BadRequest(result.Errors.FirstOrDefault().Description);
+                return BadRequest(result.Errors.FirstOrDefault()?.Description);
             }
 
-            var myToken = await userHelper.GenerateEmailConfirmationTokenAsync(user);
+            var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
             var tokenLink = Url.Action("ConfirmEmail", "Account", new
             {
                 userid = user.Id,
                 token = myToken
             }, protocol: HttpContext.Request.Scheme);
 
-            this.mailHelper.SendMail(request.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+            _mailHelper.SendMail(request.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
                 $"To allow the user, " +
                 $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
 
             return Ok(new Response
             {
                 IsSuccess = true,
-                Message = "A Confirmation email was sent. Plese confirm your account and log into the App."
+                Message = "A Confirmation email was sent. Please confirm your account and log into the App."
             });
         }
 
@@ -84,26 +84,26 @@ namespace WebAPI.Controllers.API
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "Bad request"
                 });
             }
 
-            var user = await this.userHelper.GetUserByEmailAsync(request.Email);
+            var user = await _userHelper.GetUserByEmailAsync(request.Email);
             if (user == null)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "This email is not assigned to any user."
                 });
             }
 
-            var myToken = await userHelper.GeneratePasswordResetTokenAsync(user);
+            var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
             var link = Url.Action("ResetPassword", "Account", new { token = myToken }, protocol: HttpContext.Request.Scheme);
-            this.mailHelper.SendMail(request.Email, "Password Reset", $"<h1>Recover Password</h1>" +
+            _mailHelper.SendMail(request.Email, "Password Reset", $"<h1>Recover Password</h1>" +
                 $"To reset the password click in this link:</br></br>" +
                 $"<a href = \"{link}\">Reset Password</a>");
 
@@ -121,17 +121,17 @@ namespace WebAPI.Controllers.API
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "Bad request"
                 });
             }
 
-            var user = await this.userHelper.GetUserByEmailAsync(request.Email);
+            var user = await _userHelper.GetUserByEmailAsync(request.Email);
             if (user == null)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "User don't exists."
@@ -146,13 +146,13 @@ namespace WebAPI.Controllers.API
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(ModelState);
+                return BadRequest(ModelState);
             }
 
-            var userEntity = await this.userHelper.GetUserByEmailAsync(user.Email);
+            var userEntity = await _userHelper.GetUserByEmailAsync(user.Email);
             if (userEntity == null)
             {
-                return this.BadRequest("User not found.");
+                return BadRequest("User not found.");
             }
 
             
@@ -161,13 +161,13 @@ namespace WebAPI.Controllers.API
             userEntity.Address = user.Address;
             userEntity.PhoneNumber = user.PhoneNumber;
 
-            var respose = await userHelper.UpdateUserAsync(userEntity);
-            if (!respose.Succeeded)
+            var response = await _userHelper.UpdateUserAsync(userEntity);
+            if (!response.Succeeded)
             {
-                return this.BadRequest(respose.Errors.FirstOrDefault().Description);
+                return BadRequest(response.Errors.FirstOrDefault()?.Description);
             }
 
-            var updatedUser = await this.userHelper.GetUserByEmailAsync(user.Email);
+            var updatedUser = await _userHelper.GetUserByEmailAsync(user.Email);
             return Ok(updatedUser);
         }
 
@@ -178,39 +178,74 @@ namespace WebAPI.Controllers.API
         {
             if (!ModelState.IsValid)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "Bad request"
                 });
             }
 
-            var user = await this.userHelper.GetUserByEmailAsync(request.Email);
+            var user = await _userHelper.GetUserByEmailAsync(request.Email);
             if (user == null)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = "This email is not assigned to any user."
                 });
             }
 
-            var result = await userHelper.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+            var result = await _userHelper.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
             if (!result.Succeeded)
             {
-                return this.BadRequest(new Response
+                return BadRequest(new Response
                 {
                     IsSuccess = false,
                     Message = result.Errors.FirstOrDefault()?.Description
                 });
             }
 
-            return this.Ok(new Response
+            return Ok(new Response
             {
                 IsSuccess = true,
                 Message = "The password was changed successfully!"
             });
         }
 
+        [HttpPost("AccessOn")]
+        public async Task<IActionResult> AccessToApplicationsOn([FromQuery] string email)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+            await _userHelper.AddUserToRoleAsync(user, "ThirdAuthLevel");
+            user.HasAccess = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
+            var response = await _userHelper.UpdateUserAsync(user);
+            if (!response.Succeeded)
+            {
+                return BadRequest(response.Errors.FirstOrDefault()?.Description);
+            }
+            return Ok();
+        }
+
+        [HttpPost("AccessOff")]
+        public async Task<IActionResult> AccessToApplicationsOff([FromQuery] string email)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+            await _userHelper.RemoveUserFromRoleAsync(user, "ThirdAuthLevel");
+            user.HasAccess = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
+            var response = await _userHelper.UpdateUserAsync(user);
+            if (!response.Succeeded)
+            {
+                return BadRequest(response.Errors.FirstOrDefault()?.Description);
+            }
+            return Ok();
+        }
     }
 }

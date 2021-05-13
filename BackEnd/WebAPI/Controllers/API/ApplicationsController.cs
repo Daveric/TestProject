@@ -1,15 +1,6 @@
-﻿#nullable enable
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Models;
-using MvvmCross.Binding.Extensions;
 using WebAPI.Data.Repositories;
-using WebAPI.Helper;
 
 namespace WebAPI.Controllers.API
 {
@@ -25,15 +16,15 @@ namespace WebAPI.Controllers.API
         }
 
         [HttpGet("[action]")]
-        public IActionResult GetAppId([FromQuery]string name)
+        public async Task<IActionResult> GetAppId([FromQuery]string name)
         {
-            return Ok(_applicationRepository.GetGuidByApplicationName(name));
+            return Ok(await _applicationRepository.GetGuidByApplicationName(name));
         }
 
         [HttpGet("[action]")]
-        public IActionResult GetAccess([FromQuery] string name)
+        public async Task<IActionResult> GetAccess([FromQuery] string userName)
         {
-            return Ok(_applicationRepository.GetApplicationAccessToUser(name));
+            return Ok(await _applicationRepository.GetApplicationAccessToUserAsync(userName));
         }
         
         [HttpGet]

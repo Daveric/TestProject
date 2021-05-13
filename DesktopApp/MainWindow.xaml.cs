@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using QRCoder;
@@ -30,21 +31,35 @@ namespace DesktopApp
             var qrCode = new PngByteQRCode(qrCodeData);
             var qrCodeAsPng = qrCode.GetGraphic(20);
             QrCodeImage.Source = ToImage(qrCodeAsPng);
-            InfoText.Text += ResponseFromApi();
+            InfoText.Text += GetAccessValue().ToString() ?? string.Empty;
         }
 
-        private static string ResponseFromApi()
+        private static async Task<bool> ResponseFromApiAsync()
         {
-            var request = new RestRequest("Applications/GetAccess", Method.GET);
-            request.AddQueryParameter("name", ApplicationName);
-            var response = Client.Execute(request);
-            if (response.StatusCode != HttpStatusCode.OK)
-                return string.Empty;
+            var result = GetAccessValue();
+            return await result;
 
+
+            //var request = new RestRequest("Applications/GetAccess", Method.GET) {Timeout = 5000};
+            //request.AddQueryParameter("name", ApplicationName);
+            //var response = Client.Execute(request);
+            //if (response.StatusCode != HttpStatusCode.OK)
+            //    return string.Empty;
+            //var jsonSerializer = new JsonSerializer();
+            //return jsonSerializer.Deserialize<bool>(response) ? "Unlocked" : "User has not the permissions";
+        }
+
+        private static async Task<bool> GetAccessValue()
+        {
+            var request = new RestRequest("Applications/GetAccess", Method.GET) { Timeout = 10000 };
+            request.AddQueryParameter("name", ApplicationName); 
+            var response = await Client.ExecuteAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                return false;
 
             var jsonSerializer = new JsonSerializer();
-            return jsonSerializer.Deserialize<bool>(response) ? "Unlocked" : "User has not the permissions";
-        }
+            return jsonSerializer.Deserialize<bool>(response);
+        } 
 
         private static string Load_Guid()
         {

@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,7 +60,8 @@ namespace WebAPI
             services.AddTransient<SeedDb>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<IUserHelper, UserHelper>();
-            
+            services.AddScoped<IMailHelper, MailHelper>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;

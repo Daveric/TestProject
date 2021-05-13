@@ -18,67 +18,68 @@ namespace WebAPI.Controllers
 
     public class AccountController : Controller
     {
-        private readonly IUserHelper userHelper;
-        private readonly IMailHelper mailHelper;
-        private readonly IConfiguration configuration;
+        private readonly IUserHelper _userHelper;
+        private readonly IMailHelper _mailHelper;
+        private readonly IConfiguration _configuration;
 
         public AccountController(IUserHelper userHelper, IMailHelper mailHelper, IConfiguration configuration)
         {
-            this.userHelper = userHelper;
-            this.mailHelper = mailHelper;
-            this.configuration = configuration;
+            _userHelper = userHelper;
+            _mailHelper = mailHelper;
+            _configuration = configuration;
         }
 
         public IActionResult Login()
         {
-            if (this.User.Identity.IsAuthenticated)
+            var userIdentity = User.Identity;
+            if (userIdentity != null && userIdentity.IsAuthenticated)
             {
-                return this.RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home");
             }
 
-            return this.View();
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var result = await this.userHelper.LoginAsync(model);
+                var result = await _userHelper.LoginAsync(model);
                 if (result.Succeeded)
                 {
-                    if (this.Request.Query.Keys.Contains("ReturnUrl"))
+                    if (Request.Query.Keys.Contains("ReturnUrl"))
                     {
-                        return this.Redirect(this.Request.Query["ReturnUrl"].First());
+                        return Redirect(Request.Query["ReturnUrl"].First());
                     }
 
-                    return this.RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home");
                 }
             }
 
-            this.ModelState.AddModelError(string.Empty, "Failed to login.");
-            return this.View(model);
+            ModelState.AddModelError(string.Empty, "Failed to login.");
+            return View(model);
         }
 
         public async Task<IActionResult> Logout()
         {
-            await this.userHelper.LogoutAsync();
-            return this.RedirectToAction("Index", "Home");
+            await _userHelper.LogoutAsync();
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()
         {
             var model = new RegisterNewUserViewModel();
 
-            return this.View(model);
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = await userHelper.GetUserByEmailAsync(model.Username);
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
                 if (user == null)
                 {
                     user = new User
@@ -91,36 +92,36 @@ namespace WebAPI.Controllers
                         PhoneNumber = model.PhoneNumber
                     };
 
-                    var result = await this.userHelper.AddUserAsync(user, model.Password);
+                    var result = await _userHelper.AddUserAsync(user, model.Password);
                     if (result != IdentityResult.Success)
                     {
                         ModelState.AddModelError(string.Empty, "The user couldn't be created.");
-                        return this.View(model);
+                        return View(model);
                     }
 
-                    var myToken = await this.userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    var tokenLink = this.Url.Action("ConfirmEmail", "Account", new
+                    var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    var tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
                         userid = user.Id,
                         token = myToken
                     }, protocol: HttpContext.Request.Scheme);
 
-                    mailHelper.SendMail(model.Username, "Shop Email confirmation", $"<h1>Shop Email Confirmation</h1>" +
+                    _mailHelper.SendMail(model.Username, "Shop Email confirmation", $"<h1>Shop Email Confirmation</h1>" +
                         $"To allow the user, " +
                         $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
                     ViewBag.Message = "The instructions to allow your user has been sent to email.";
-                    return this.View(model);
+                    return View(model);
                 }
 
-                this.ModelState.AddModelError(string.Empty, "The username is already registered.");
+                ModelState.AddModelError(string.Empty, "The username is already registered.");
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         public async Task<IActionResult> ChangeUser()
         {
-            var user = await this.userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
             var model = new ChangeUserViewModel();
 
             if (user != null)
@@ -131,15 +132,15 @@ namespace WebAPI.Controllers
                 model.PhoneNumber = user.PhoneNumber;
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = await this.userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
                 if (user != null)
                 {
                     user.FirstName = model.FirstName;
@@ -147,7 +148,7 @@ namespace WebAPI.Controllers
                     user.Address = model.Address;
                     user.PhoneNumber = model.PhoneNumber;
 
-                    var identityResult = await this.userHelper.UpdateUserAsync(user);
+                    var identityResult = await _userHelper.UpdateUserAsync(user);
                     if (identityResult.Succeeded)
                     {
                         ViewBag.UserMessage = "User updated!";
@@ -163,50 +164,50 @@ namespace WebAPI.Controllers
                 }
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         public IActionResult ChangePassword()
         {
-            return this.View();
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = await this.userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
                 if (user != null)
                 {
-                    var result = await this.userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                     if (result.Succeeded)
                     {
-                        return this.RedirectToAction("ChangeUser");
+                        return RedirectToAction("ChangeUser");
                     }
                     else
                     {
-                        this.ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                        ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
                     }
                 }
                 else
                 {
-                    this.ModelState.AddModelError(string.Empty, "User no found.");
+                    ModelState.AddModelError(string.Empty, "User no found.");
                 }
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = await this.userHelper.GetUserByEmailAsync(model.Username);
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
                 if (user != null)
                 {
-                    var result = await this.userHelper.ValidatePasswordAsync(
+                    var result = await _userHelper.ValidatePasswordAsync(
                         user,
                         model.Password);
 
@@ -218,11 +219,11 @@ namespace WebAPI.Controllers
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                         };
 
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Tokens:Key"]));
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
                         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
                         var token = new JwtSecurityToken(
-                            this.configuration["Tokens:Issuer"],
-                            this.configuration["Tokens:Audience"],
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
                             claims,
                             expires: DateTime.UtcNow.AddDays(15),
                             signingCredentials: credentials);
@@ -232,36 +233,36 @@ namespace WebAPI.Controllers
                             expiration = token.ValidTo
                         };
 
-                        return this.Created(string.Empty, results);
+                        return Created(string.Empty, results);
                     }
                 }
             }
 
-            return this.BadRequest();
+            return BadRequest();
         }
 
         public IActionResult NotAuthorized()
         {
-            return this.View();
+            return View();
         }
         
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                return this.NotFound();
+                return NotFound();
             }
 
-            var user = await this.userHelper.GetUserByIdAsync(userId);
+            var user = await _userHelper.GetUserByIdAsync(userId);
             if (user == null)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
-            var result = await this.userHelper.ConfirmEmailAsync(user, token);
+            var result = await _userHelper.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
-                return this.NotFound();
+                return NotFound();
             }
 
             return View();
@@ -269,33 +270,33 @@ namespace WebAPI.Controllers
 
         public IActionResult RecoverPassword()
         {
-            return this.View();
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
         {
-            if (this.ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = await this.userHelper.GetUserByEmailAsync(model.Email);
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
-                    return this.View(model);
+                    return View(model);
                 }
 
-                var myToken = await this.userHelper.GeneratePasswordResetTokenAsync(user);
-                var link = this.Url.Action("ResetPassword", "Account", new { token = myToken }, protocol: HttpContext.Request.Scheme);
-                var mailSender = new MailHelper(configuration);
-                mailSender.SendMail(model.Email, "Shop Password Reset", $"<h1>Shop Recover Password</h1>" +
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                var link = Url.Action("ResetPassword", "Account", new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                var mailSender = new MailHelper(_configuration);
+                mailSender.SendMail(model.Email, subject: "Shop Password Reset", body: $"<h1>Shop Recover Password</h1>" +
                     $"To reset the password click in this link:</br></br>" +
                     $"<a href = \"{link}\">Reset Password</a>");
-                this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
-                return this.View();
+                ViewBag.Message = "The instructions to recover your password has been sent to email.";
+                return View();
 
             }
 
-            return this.View(model);
+            return View(model);
         }
 
         public IActionResult ResetPassword(string token)
@@ -306,38 +307,37 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
-            var user = await this.userHelper.GetUserByEmailAsync(model.UserName);
+            var user = await _userHelper.GetUserByEmailAsync(model.UserName);
             if (user != null)
             {
-                var result = await this.userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
                 if (result.Succeeded)
                 {
-                    this.ViewBag.Message = "Password reset successful.";
-                    return this.View();
+                    ViewBag.Message = "Password reset successful.";
+                    return View();
                 }
 
-                this.ViewBag.Message = "Error while resetting the password.";
+                ViewBag.Message = "Error while resetting the password.";
                 return View(model);
             }
 
-            this.ViewBag.Message = "User not found.";
+            ViewBag.Message = "User not found.";
             return View(model);
         }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            var users = await this.userHelper.GetAllUsersAsync();
+            var users = await _userHelper.GetAllUsersAsync();
             foreach (var user in users)
             {
-                var myUser = await this.userHelper.GetUserByIdAsync(user.Id);
-                if (myUser != null)
-                {
-                    user.IsAdmin = await this.userHelper.IsUserInRoleAsync(myUser, "Admin");
-                }
+                var myUser = await _userHelper.GetUserByIdAsync(user.Id);
+                if (myUser == null) continue;
+                user.IsAdmin = await _userHelper.IsUserInRoleAsync(myUser, "Admin");
+                user.HasAccess = await _userHelper.IsUserInRoleAsync(myUser, "3AuthLevel");
             }
 
-            return this.View(users);
+            return View(users);
         }
 
 
@@ -349,14 +349,14 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var user = await this.userHelper.GetUserByIdAsync(id);
+            var user = await _userHelper.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            await this.userHelper.RemoveUserFromRoleAsync(user, "Admin");
-            return this.RedirectToAction(nameof(Index));
+            await _userHelper.RemoveUserFromRoleAsync(user, "Admin");
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize(Roles = "Admin")]
@@ -367,14 +367,14 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var user = await this.userHelper.GetUserByIdAsync(id);
+            var user = await _userHelper.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            await this.userHelper.AddUserToRoleAsync(user, "Admin");
-            return this.RedirectToAction(nameof(Index));
+            await _userHelper.AddUserToRoleAsync(user, "Admin");
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize(Roles = "Admin")]
@@ -385,14 +385,14 @@ namespace WebAPI.Controllers
                 return NotFound();
             }
 
-            var user = await this.userHelper.GetUserByIdAsync(id);
+            var user = await _userHelper.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            await this.userHelper.DeleteUserAsync(user);
-            return this.RedirectToAction(nameof(Index));
+            await _userHelper.DeleteUserAsync(user);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

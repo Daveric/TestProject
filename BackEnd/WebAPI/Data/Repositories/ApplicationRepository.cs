@@ -1,11 +1,9 @@
 ﻿
-
-using System;
-using System.Threading.Tasks;
-
 namespace WebAPI.Data.Repositories
 {
-    using System.Linq;
+    using System;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using Entities;
 
     public class ApplicationRepository : GenericRepository<Application>, IApplicationRepository
@@ -17,21 +15,21 @@ namespace WebAPI.Data.Repositories
             _context = context;
         }
 
-        public bool GetApplicationAccessToUser(string name)
+        public async Task<bool> GetApplicationAccessToUserAsync(string userName)
         {
-            var userIsAdmin = _context.Applications?.AsQueryable().FirstOrDefault(a => a.Name == name)?.User.IsAdmin;
-            return userIsAdmin != null && (bool) userIsAdmin;
+            if (_context.Users == null) return false;
+            var user = await _context.Users?.AsQueryable().FirstOrDefaultAsync(u => u.Email == userName);
+            var userHasAccess = user?.HasAccess;
+            return userHasAccess != null && (bool)userHasAccess;
         }
 
 
-        public Guid GetGuidByApplicationName(string name)
+        public async Task<Guid> GetGuidByApplicationName(string name)
         {
-            var appId = _context.Applications?.AsQueryable().FirstOrDefault(a => a.Name == name)?.AppId;
-            if (appId != null)
-                return (Guid) appId;
-
-            return default;
+            if (_context.Applications == null) return default;
+            var appId = await _context.Applications?.AsQueryable().FirstOrDefaultAsync(a => a.Name == name);
+            return appId?.AppId ?? default;
         }
-
+        
     }
 }

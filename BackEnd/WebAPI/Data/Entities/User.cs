@@ -27,5 +27,8 @@ namespace WebAPI.Data.Entities
         [Display(Name = "Is Admin?")]
         public bool IsAdmin { get; set; }
 
+        [Display(Name = "Access to Applications")]
+        public bool HasAccess { get; set; }
+
     }
 }

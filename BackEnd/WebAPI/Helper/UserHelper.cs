@@ -11,57 +11,66 @@ namespace WebAPI.Helper
 
     public class UserHelper : IUserHelper
     {
-        private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.roleManager = roleManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         public async Task<IdentityResult> AddUserAsync(User user, string password)
         {
-            return await this.userManager.CreateAsync(user, password);
+            return await _userManager.CreateAsync(user, password);
         }
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await this.userManager.FindByEmailAsync(email);
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task AddUserToRoleAsync(User user, string roleName)
         {
-            await this.userManager.AddToRoleAsync(user, roleName);
+            await _userManager.AddToRoleAsync(user, roleName);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
         {
-            return await this.userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            return await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
         }
 
         public async Task CheckRoleAsync(string roleName)
         {
-            var roleExists = await this.roleManager.RoleExistsAsync(roleName);
+            var roleExists = await _roleManager.RoleExistsAsync(roleName);
             if (!roleExists)
             {
-                await this.roleManager.CreateAsync(new IdentityRole
+                await _roleManager.CreateAsync(new IdentityRole
                 {
                     Name = roleName
                 });
             }
         }
 
+        public async Task DeleteRoleAsync(string roleName)
+        {
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role != null)
+            {
+                await _roleManager.DeleteAsync(role);
+            }
+        }
+
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
         {
-            return await userManager.IsInRoleAsync(user, roleName);
+            return await _userManager.IsInRoleAsync(user, roleName);
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
         {
-            return await this.signInManager.PasswordSignInAsync(
+            return await _signInManager.PasswordSignInAsync(
                 model.Username,
                 model.Password,
                 model.RememberMe,
@@ -70,17 +79,17 @@ namespace WebAPI.Helper
 
         public async Task LogoutAsync()
         {
-            await this.signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
         }
 
         public async Task<IdentityResult> UpdateUserAsync(User user)
         {
-            return await this.userManager.UpdateAsync(user);
+            return await _userManager.UpdateAsync(user);
         }
 
         public async Task<SignInResult> ValidatePasswordAsync(User user, string password)
         {
-            return await this.signInManager.CheckPasswordSignInAsync(
+            return await _signInManager.CheckPasswordSignInAsync(
                 user,
                 password,
                 false);
@@ -88,44 +97,44 @@ namespace WebAPI.Helper
 
         public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
         {
-            return await this.userManager.ConfirmEmailAsync(user, token);
+            return await _userManager.ConfirmEmailAsync(user, token);
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
         {
-            return await userManager.GenerateEmailConfirmationTokenAsync(user);
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
         public async Task<User> GetUserByIdAsync(string userId)
         {
-            return await this.userManager.FindByIdAsync(userId);
+            return await _userManager.FindByIdAsync(userId);
         }
 
         public async Task<string> GeneratePasswordResetTokenAsync(User user)
         {
-            return await this.userManager.GeneratePasswordResetTokenAsync(user);
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
         {
-            return await this.userManager.ResetPasswordAsync(user, token, password);
+            return await _userManager.ResetPasswordAsync(user, token, password);
         }
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await this.userManager.Users
+            return await _userManager.Users
                 .OrderBy(u => u.LastName)
                 .ToListAsync();
         }
 
         public async Task RemoveUserFromRoleAsync(User user, string roleName)
         {
-            await this.userManager.RemoveFromRoleAsync(user, roleName);
+            await _userManager.RemoveFromRoleAsync(user, roleName);
         }
 
         public async Task DeleteUserAsync(User user)
         {
-            await this.userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
         }
     }
 }
