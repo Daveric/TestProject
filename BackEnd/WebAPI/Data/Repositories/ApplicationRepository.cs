@@ -15,14 +15,13 @@ namespace WebAPI.Data.Repositories
             _context = context;
         }
 
-        public async Task<bool> GetApplicationAccessToUserAsync(string userName)
+        public async Task<bool> GetApplicationAccessAsync(string name)
         {
-            if (_context.Users == null) return false;
-            var user = await _context.Users?.AsQueryable().FirstOrDefaultAsync(u => u.Email == userName);
-            var userHasAccess = user?.HasAccess;
+            if (_context.Applications == null) return false;
+            var app = await _context.Applications.Include(a=>a.User).FirstOrDefaultAsync(a => a.Name == name);
+            var userHasAccess = app.User?.HasAccess;
             return userHasAccess != null && (bool)userHasAccess;
         }
-
 
         public async Task<Guid> GetGuidByApplicationName(string name)
         {
@@ -30,6 +29,6 @@ namespace WebAPI.Data.Repositories
             var appId = await _context.Applications?.AsQueryable().FirstOrDefaultAsync(a => a.Name == name);
             return appId?.AppId ?? default;
         }
-        
+
     }
 }
