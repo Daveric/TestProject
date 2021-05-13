@@ -11,9 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FirebaseAuthentication.net" Version="3.7.1" />
     <PackageReference Include="MvvmLight" Version="5.4.1.1" />
-    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="MvvmLightLibsStd10" Version="5.4.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
@@ -21,16 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\AccessApp\RegisterPage.xaml.cs">
-      <DependentUpon>RegisterPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\AccessApp\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Views\AccessApp\LoginPage.xaml">
+    <EmbeddedResource Update="Views\LoginPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
