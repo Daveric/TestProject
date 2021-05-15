@@ -14,9 +14,9 @@ namespace Common.ViewModels
 
     public class ApplicationsDetailViewModel : MvxViewModel<NavigationArgs>
     {
-        private readonly IApiService apiService;
-        private readonly IDialogService dialogService;
-        private readonly IMvxNavigationService navigationService;
+        private readonly IApiService _apiService;
+        private readonly IDialogService _dialogService;
+        private readonly IMvxNavigationService _navigationService;
         private Application application;
         private bool isLoading;
         private MvxCommand updateCommand;
@@ -27,30 +27,30 @@ namespace Common.ViewModels
             IDialogService dialogService,
             IMvxNavigationService navigationService)
         {
-            this.apiService = apiService;
-            this.dialogService = dialogService;
-            this.navigationService = navigationService;
-            this.IsLoading = false;
+            _apiService = apiService;
+            _dialogService = dialogService;
+            _navigationService = navigationService;
+            IsLoading = false;
         }
 
         public bool IsLoading
         {
-            get => this.isLoading;
-            set => this.SetProperty(ref this.isLoading, value);
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
         }
 
         public Application Application
         {
-            get => this.application;
-            set => this.SetProperty(ref this.application, value);
+            get => application;
+            set => SetProperty(ref application, value);
         }
 
         public ICommand UpdateCommand
         {
             get
             {
-                updateCommand ??= new MvxCommand(this.Update);
-                return this.updateCommand;
+                updateCommand ??= new MvxCommand(Update);
+                return updateCommand;
             }
         }
 
@@ -58,14 +58,14 @@ namespace Common.ViewModels
         {
             get
             {
-                deleteCommand ??= new MvxCommand(this.Delete);
-                return this.deleteCommand;
+                deleteCommand ??= new MvxCommand(Delete);
+                return deleteCommand;
             }
         }
 
         private void Delete()
         {
-            this.dialogService.Confirm(
+            _dialogService.Confirm(
                 "Confirm",
                 "This action can't be undone, are you sure to delete the product?",
                 "Yes",
@@ -76,11 +76,11 @@ namespace Common.ViewModels
 
         private async Task ConfirmDelete()
         {
-            this.IsLoading = true;
+            IsLoading = true;
 
             var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
 
-            var response = await this.apiService.DeleteAsync(
+            var response = await _apiService.DeleteAsync(
                 Constants.UrlBase,
                 "/api",
                 "/Application",
@@ -88,29 +88,29 @@ namespace Common.ViewModels
                 "bearer",
                 token.Token);
 
-            this.IsLoading = false;
+            IsLoading = false;
 
             if (!response.IsSuccess)
             {
-                this.dialogService.Alert("Error", response.Message, "Accept");
+                _dialogService.Alert("Error", response.Message, "Accept");
                 return;
             }
 
-            await this.navigationService.Close(this);
+            await _navigationService.Close(this);
         }
 
         private async void Update()
         {
             if (string.IsNullOrEmpty(Application.Name))
             {
-                this.dialogService.Alert("Error", "You must enter an application name.", "Accept");
+                _dialogService.Alert("Error", "You must enter an application name.", "Accept");
                 return;
             }
             IsLoading = true;
 
             var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
 
-            var response = await this.apiService.PutAsync(
+            var response = await _apiService.PutAsync(
                 Constants.UrlBase,
                 "/api",
                 "/Application",
@@ -119,15 +119,15 @@ namespace Common.ViewModels
                 "bearer",
                 token.Token);
 
-            this.IsLoading = false;
+            IsLoading = false;
 
             if (!response.IsSuccess)
             {
-                this.dialogService.Alert("Error", response.Message, "Accept");
+                _dialogService.Alert("Error", response.Message, "Accept");
                 return;
             }
 
-            await this.navigationService.Close(this);
+            await _navigationService.Close(this);
         }
 
         public override void Prepare(NavigationArgs parameter) => application = parameter.Application;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Common.Helpers
 {
     using Plugin.Settings;
@@ -20,7 +17,7 @@ namespace Common.Helpers
 
         private static ISettings AppSettings => CrossSettings.Current;
 
-        public static string Products
+        public static string Applications
         {
             get => AppSettings.GetValueOrDefault(applications, stringDefault);
             set => AppSettings.AddOrUpdateValue(applications, value);

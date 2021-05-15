@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<FlyoutPage  xmlns="http://xamarin.com/schemas/2014/forms"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                   x:Class="MobileApp.Views.MasterPage"
+                   xmlns:pages="clr-namespace:MobileApp.Views">
+    <FlyoutPage.Flyout>
+        <pages:MenuPage/>
+    </FlyoutPage.Flyout>
+    <FlyoutPage.Detail>
+        <NavigationPage x:Name="Navigator">
+            <x:Arguments>
+                <pages:ScanQRCodePage />
+            </x:Arguments>
+        </NavigationPage>
+    </FlyoutPage.Detail>
+</FlyoutPage>

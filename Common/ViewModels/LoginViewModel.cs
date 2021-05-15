@@ -17,10 +17,10 @@ namespace Common.ViewModels
         private string password;
         private MvxCommand loginCommand;
         private MvxCommand registerCommand;
-        private readonly IApiService apiService;
-        private readonly IDialogService dialogService;
-        private readonly IMvxNavigationService navigationService;
-        private readonly INetworkProvider networkProvider;
+        private readonly IApiService _apiService;
+        private readonly IDialogService _dialogService;
+        private readonly IMvxNavigationService _navigationService;
+        private readonly INetworkProvider _networkProvider;
         private bool isLoading;
 
         public LoginViewModel(
@@ -29,40 +29,40 @@ namespace Common.ViewModels
             IMvxNavigationService navigationService,
             INetworkProvider networkProvider)
         {
-            this.apiService = apiService;
-            this.dialogService = dialogService;
-            this.navigationService = navigationService;
-            this.networkProvider = networkProvider;
+            _apiService = apiService;
+            _dialogService = dialogService;
+            _navigationService = navigationService;
+            _networkProvider = networkProvider;
 
-            this.Email = "jzuluaga55@gmail.com";
-            this.Password = "123456";
-            this.IsLoading = false;
+            Email = "erickdavid17@outlook.com";
+            Password = "Pwd12345.";
+            IsLoading = false;
         }
 
         public bool IsLoading
         {
-            get => this.isLoading;
-            set => this.SetProperty(ref this.isLoading, value);
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
         }
 
         public string Email
         {
-            get => this.email;
-            set => this.SetProperty(ref this.email, value);
+            get => email;
+            set => SetProperty(ref email, value);
         }
 
         public string Password
         {
-            get => this.password;
-            set => this.SetProperty(ref this.password, value);
+            get => password;
+            set => SetProperty(ref password, value);
         }
 
         public ICommand LoginCommand
         {
             get
             {
-                loginCommand ??= new MvxCommand(this.DoLoginCommand);
-                return this.loginCommand;
+                loginCommand ??= new MvxCommand(DoLoginCommand);
+                return loginCommand;
             }
         }
 
@@ -70,45 +70,45 @@ namespace Common.ViewModels
         {
             get
             {
-                this.registerCommand = this.registerCommand ?? new MvxCommand(this.DoRegisterCommand);
-                return this.registerCommand;
+                registerCommand ??= new MvxCommand(DoRegisterCommand);
+                return registerCommand;
             }
         }
 
         private async void DoRegisterCommand()
         {
-            await this.navigationService.Navigate<RegisterViewModel>();
+            await _navigationService.Navigate<RegisterViewModel>();
         }
 
         private async void DoLoginCommand()
         {
-            if (string.IsNullOrEmpty(this.Email))
+            if (string.IsNullOrEmpty(Email))
             {
-                this.dialogService.Alert("Error", "You must enter an email.", "Accept");
+                _dialogService.Alert("Error", "You must enter an email.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Password))
+            if (string.IsNullOrEmpty(Password))
             {
-                this.dialogService.Alert("Error", "You must enter a password.", "Accept");
+                _dialogService.Alert("Error", "You must enter a password.", "Accept");
                 return;
             }
 
-            if (!this.networkProvider.IsConnectedToWifi())
+            if (!_networkProvider.IsConnectedToWifi())
             {
-                this.dialogService.Alert("Error", "The App requiered a internet connection, please check and try again.", "Accept");
+                _dialogService.Alert("Error", "The App requiered a internet connection, please check and try again.", "Accept");
                 return;
             }
 
-            this.IsLoading = true;
+            IsLoading = true;
 
             var request = new TokenRequest
             {
-                Password = this.Password,
-                Username = this.Email
+                Password = Password,
+                Username = Email
             };
 
-            var response = await this.apiService.GetTokenAsync(
+            var response = await _apiService.GetTokenAsync(
                 Constants.UrlBase,
                 "/Account",
                 "/CreateToken",
@@ -116,29 +116,29 @@ namespace Common.ViewModels
 
             if (!response.IsSuccess)
             {
-                this.IsLoading = false;
-                this.dialogService.Alert("Error", "User or password incorrect.", "Accept");
+                IsLoading = false;
+                _dialogService.Alert("Error", "User or password incorrect.", "Accept");
                 return;
             }
 
             var token = (TokenResponse)response.Result;
 
-            var response2 = await this.apiService.GetUserByEmailAsync(
+            var response2 = await _apiService.GetUserByEmailAsync(
                 Constants.UrlBase,
                 "/api",
                 "/Account/GetUserByEmail",
-                this.Email,
+                Email,
                 "bearer",
                 token.Token);
 
             var user = (User)response2.Result;
-            Settings.UserPassword = this.Password;
+            Settings.UserPassword = Password;
             Settings.User = JsonConvert.SerializeObject(user);
-            Settings.UserEmail = this.Email;
+            Settings.UserEmail = Email;
             Settings.Token = JsonConvert.SerializeObject(token);
 
-            this.IsLoading = false;
-            await this.navigationService.Navigate<ApplicationsViewModel>();
+            IsLoading = false;
+            await _navigationService.Navigate<ApplicationsViewModel>();
         }
     }
 }

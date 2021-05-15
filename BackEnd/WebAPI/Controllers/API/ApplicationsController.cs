@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Common.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data.Repositories;
@@ -35,25 +38,39 @@ namespace WebAPI.Controllers.API
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_applicationRepository.GetAll());
+            return Ok(_applicationRepository.GetAll().Include(app => app.User));
         }
 
-        [HttpPost("set-user-app")]
-        public async Task<IActionResult> SetUserToCurrentApp([FromQuery] string username, [FromQuery]string guid)
+        [HttpPost]
+        [Route("SetUserToApp")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> PostUserToCurrentApp([FromBody] SetUserToAppRequest request)
         {
-            var user = await _userHelper.GetUserByEmailAsync(username);
+            var user = await _userHelper.GetUserByEmailAsync(request.Email);
             if (user == null)
             {
-                return BadRequest("User not found.");
+                return BadRequest(new Response
+                {
+                    IsSuccess = false,
+                    Message = "User not found"
+                });
             }
 
-            var app = await _applicationRepository.GetAll().FirstOrDefaultAsync(a => a.AppId == Guid.Parse(guid));
+            var app = await _applicationRepository.GetAll().FirstOrDefaultAsync(a => a.AppId == Guid.Parse(request.AppId));
             app.User = user;
             if (await _applicationRepository.UpdateAsync(app) == null)
             {
-                return BadRequest("Cannot update application.");
+                return BadRequest(new Response
+                {
+                    IsSuccess = false,
+                    Message = "Bad request"
+                });
             }
-            return Ok();
+            return Ok(new Response
+            {
+                IsSuccess = true,
+                Message = "The user now is set to the current application"
+            });
         }
 
     }

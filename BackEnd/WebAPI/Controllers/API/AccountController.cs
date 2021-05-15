@@ -213,6 +213,7 @@ namespace WebAPI.Controllers.API
         }
 
         [HttpPost("AccessOn")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> AccessToApplicationsOn([FromQuery] string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);
@@ -231,6 +232,7 @@ namespace WebAPI.Controllers.API
         }
 
         [HttpPost("AccessOff")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> AccessToApplicationsOff([FromQuery] string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);

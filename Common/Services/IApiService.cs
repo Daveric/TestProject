@@ -1,5 +1,4 @@
-﻿
-namespace Common.Services
+﻿namespace Common.Services
 {
     using System.Threading.Tasks;
     using Models;
@@ -27,5 +26,8 @@ namespace Common.Services
         Task<Response> RecoverPasswordAsync(string urlBase, string servicePrefix, string controller, RecoverPasswordRequest recoverPasswordRequest);
 
         Task<Response> RegisterUserAsync(string urlBase, string servicePrefix, string controller, NewUserRequest newUserRequest);
+
+        Task<Response> PostUserToAppAsync(string urlBase, string servicePrefix, string controller,
+            SetUserToAppRequest setUserToAppRequest, string tokenType, string accessToken);
     }
 }

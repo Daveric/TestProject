@@ -12,9 +12,9 @@ namespace Common.ViewModels
 
     public class RegisterViewModel : MvxViewModel
     {
-        private readonly IApiService apiService;
-        private readonly IMvxNavigationService navigationService;
-        private readonly IDialogService dialogService;
+        private readonly IApiService _apiService;
+        private readonly IMvxNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
         private MvxCommand registerCommand;
         private string firstName;
         private string lastName;
@@ -30,164 +30,164 @@ namespace Common.ViewModels
             IApiService apiService,
             IDialogService dialogService)
         {
-            this.apiService = apiService;
-            this.navigationService = navigationService;
-            this.dialogService = dialogService;
-            this.IsLoading = false;
+            _apiService = apiService;
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+            IsLoading = false;
         }
 
         public bool IsLoading
         {
-            get => this.isLoading;
-            set => this.SetProperty(ref this.isLoading, value);
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
         }
 
         public ICommand RegisterCommand
         {
             get
             {
-                registerCommand ??= new MvxCommand(this.RegisterUser);
-                return this.registerCommand;
+                registerCommand ??= new MvxCommand(RegisterUser);
+                return registerCommand;
             }
         }
 
         public string FirstName
         {
-            get => this.firstName;
-            set => this.SetProperty(ref this.firstName, value);
+            get => firstName;
+            set => SetProperty(ref firstName, value);
         }
 
         public string LastName
         {
-            get => this.lastName;
-            set => this.SetProperty(ref this.lastName, value);
+            get => lastName;
+            set => SetProperty(ref lastName, value);
         }
 
         public string Email
         {
-            get => this.email;
-            set => this.SetProperty(ref this.email, value);
+            get => email;
+            set => SetProperty(ref email, value);
         }
 
         public string Address
         {
-            get => this.address;
-            set => this.SetProperty(ref this.address, value);
+            get => address;
+            set => SetProperty(ref address, value);
         }
 
         public string Phone
         {
-            get => this.phone;
-            set => this.SetProperty(ref this.phone, value);
+            get => phone;
+            set => SetProperty(ref phone, value);
         }
 
         public string Password
         {
-            get => this.password;
-            set => this.SetProperty(ref this.password, value);
+            get => password;
+            set => SetProperty(ref password, value);
         }
 
         public string ConfirmPassword
         {
-            get => this.confirmPassword;
-            set => this.SetProperty(ref this.confirmPassword, value);
+            get => confirmPassword;
+            set => SetProperty(ref confirmPassword, value);
         }
 
         private async void RegisterUser()
         {
-            if (string.IsNullOrEmpty(this.FirstName))
+            if (string.IsNullOrEmpty(FirstName))
             {
-                this.dialogService.Alert("Error", "You must enter a first name.", "Accept");
+                _dialogService.Alert("Error", "You must enter a first name.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.LastName))
+            if (string.IsNullOrEmpty(LastName))
             {
-                this.dialogService.Alert("Error", "You must enter a last name.", "Accept");
+                _dialogService.Alert("Error", "You must enter a last name.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Email))
+            if (string.IsNullOrEmpty(Email))
             {
-                this.dialogService.Alert("Error", "You must enter an email.", "Accept");
+                _dialogService.Alert("Error", "You must enter an email.", "Accept");
                 return;
             }
 
-            if (!RegexHelper.IsValidEmail(this.Email))
+            if (!RegexHelper.IsValidEmail(Email))
             {
-                this.dialogService.Alert("Error", "You must enter a valid email.", "Accept");
+                _dialogService.Alert("Error", "You must enter a valid email.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Address))
+            if (string.IsNullOrEmpty(Address))
             {
-                this.dialogService.Alert("Error", "You must enter an address.", "Accept");
+                _dialogService.Alert("Error", "You must enter an address.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Phone))
+            if (string.IsNullOrEmpty(Phone))
             {
-                this.dialogService.Alert("Error", "You must enter a phone.", "Accept");
+                _dialogService.Alert("Error", "You must enter a phone.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.Password))
+            if (string.IsNullOrEmpty(Password))
             {
-                this.dialogService.Alert("Error", "You must enter a pasword.", "Accept");
+                _dialogService.Alert("Error", "You must enter a pasword.", "Accept");
                 return;
             }
 
-            if (this.Password.Length < 6)
+            if (Password.Length < 6)
             {
-                this.dialogService.Alert("Error", "The password must be a least 6 characters.", "Accept");
+                _dialogService.Alert("Error", "The password must be a least 6 characters.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.ConfirmPassword))
+            if (string.IsNullOrEmpty(ConfirmPassword))
             {
-                this.dialogService.Alert("Error", "You must enter a pasword confirm.", "Accept");
+                _dialogService.Alert("Error", "You must enter a password confirm.", "Accept");
                 return;
             }
 
-            if (!this.Password.Equals(this.ConfirmPassword))
+            if (!Password.Equals(ConfirmPassword))
             {
-                this.dialogService.Alert("Error", "The pasword and confirm does not math.", "Accept");
+                _dialogService.Alert("Error", "The password and confirm does not math.", "Accept");
                 return;
             }
 
-            this.IsLoading = true;
+            IsLoading = true;
 
             var request = new NewUserRequest
             {
-                Address = this.Address,
-                Email = this.Email,
-                FirstName = this.FirstName,
-                LastName = this.LastName,
-                Password = this.Password,
-                Phone = this.Phone
+                Address = Address,
+                Email = Email,
+                FirstName = FirstName,
+                LastName = LastName,
+                Password = Password,
+                Phone = Phone
             };
 
-            var response = await this.apiService.RegisterUserAsync(
+            var response = await _apiService.RegisterUserAsync(
                 Constants.UrlBase,
                 "/api",
                 "/Account",
                 request);
 
-            this.IsLoading = false;
+            IsLoading = false;
 
             if (!response.IsSuccess)
             {
-                this.dialogService.Alert("Error", response.Message, "Accept");
+                _dialogService.Alert("Error", response.Message, "Accept");
                 return;
             }
 
-            this.dialogService.Alert(
+            _dialogService.Alert(
                 "Ok",
                 "The user was created successfully, you must " +
                 "confirm your user by the email sent to you and then you could login with " +
                 "the email and password entered.",
                 "Accept",
-                () => { this.navigationService.Close(this); }
+                () => { _navigationService.Close(this); }
             );
         }
     }

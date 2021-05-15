@@ -13,9 +13,9 @@ namespace Common.ViewModels
 
     public class ChangePasswordViewModel : MvxViewModel
     {
-        private readonly IApiService apiService;
-        private readonly IMvxNavigationService navigationService;
-        private readonly IDialogService dialogService;
+        private readonly IApiService _apiService;
+        private readonly IMvxNavigationService _navigationService;
+        private readonly IDialogService _dialogService;
         private MvxCommand changePasswordCommand;
         private string currentPassword;
         private string newPassword;
@@ -27,94 +27,94 @@ namespace Common.ViewModels
             IApiService apiService,
             IDialogService dialogService)
         {
-            this.apiService = apiService;
-            this.navigationService = navigationService;
-            this.dialogService = dialogService;
-            this.IsLoading = false;
+            _apiService = apiService;
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+            IsLoading = false;
         }
 
         public bool IsLoading
         {
-            get => this.isLoading;
-            set => this.SetProperty(ref this.isLoading, value);
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
         }
 
         public ICommand ChangePasswordCommand
         {
             get
             {
-                this.changePasswordCommand ??= new MvxCommand(this.ChangePassword);
-                return this.changePasswordCommand;
+                changePasswordCommand ??= new MvxCommand(ChangePassword);
+                return changePasswordCommand;
             }
         }
 
         public string CurrentPassword
         {
-            get => this.currentPassword;
-            set => this.SetProperty(ref this.currentPassword, value);
+            get => currentPassword;
+            set => SetProperty(ref currentPassword, value);
         }
 
         public string NewPassword
         {
-            get => this.newPassword;
-            set => this.SetProperty(ref this.newPassword, value);
+            get => newPassword;
+            set => SetProperty(ref newPassword, value);
         }
 
         public string ConfirmPassword
         {
-            get => this.confirmPassword;
-            set => this.SetProperty(ref this.confirmPassword, value);
+            get => confirmPassword;
+            set => SetProperty(ref confirmPassword, value);
         }
 
         private async void ChangePassword()
         {
-            if (string.IsNullOrEmpty(this.CurrentPassword))
+            if (string.IsNullOrEmpty(CurrentPassword))
             {
-                this.dialogService.Alert("Error", "You must enter a current pasword.", "Accept");
+                _dialogService.Alert("Error", "You must enter a current pasword.", "Accept");
                 return;
             }
 
-            if (!this.CurrentPassword.Equals(Settings.UserPassword))
+            if (!CurrentPassword.Equals(Settings.UserPassword))
             {
-                this.dialogService.Alert("Error", "The current pasword is not correct.", "Accept");
+                _dialogService.Alert("Error", "The current pasword is not correct.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.NewPassword))
+            if (string.IsNullOrEmpty(NewPassword))
             {
-                this.dialogService.Alert("Error", "You must enter a new pasword.", "Accept");
+                _dialogService.Alert("Error", "You must enter a new pasword.", "Accept");
                 return;
             }
 
-            if (this.NewPassword.Length < 6)
+            if (NewPassword.Length < 6)
             {
-                this.dialogService.Alert("Error", "The new password must be a least 6 characters.", "Accept");
+                _dialogService.Alert("Error", "The new password must be a least 6 characters.", "Accept");
                 return;
             }
 
-            if (string.IsNullOrEmpty(this.ConfirmPassword))
+            if (string.IsNullOrEmpty(ConfirmPassword))
             {
-                this.dialogService.Alert("Error", "You must enter a pasword confirm.", "Accept");
+                _dialogService.Alert("Error", "You must enter a password confirm.", "Accept");
                 return;
             }
 
-            if (!this.NewPassword.Equals(this.ConfirmPassword))
+            if (!NewPassword.Equals(ConfirmPassword))
             {
-                this.dialogService.Alert("Error", "The pasword and confirm does not math.", "Accept");
+                _dialogService.Alert("Error", "The password and confirm does not math.", "Accept");
                 return;
             }
 
-            this.IsLoading = true;
+            IsLoading = true;
 
             var request = new ChangePasswordRequest
             {
                 Email = Settings.UserEmail,
-                NewPassword = this.NewPassword,
-                OldPassword = this.CurrentPassword
+                NewPassword = NewPassword,
+                OldPassword = CurrentPassword
             };
 
             var token = JsonConvert.DeserializeObject<TokenResponse>(Settings.Token);
-            var response = await this.apiService.ChangePasswordAsync(
+            var response = await _apiService.ChangePasswordAsync(
                 Constants.UrlBase,
                 "/api",
                 "/Account/ChangePassword",
@@ -124,12 +124,12 @@ namespace Common.ViewModels
 
             if (!response.IsSuccess)
             {
-                this.dialogService.Alert("Error", response.Message, "Accept");
+                _dialogService.Alert("Error", response.Message, "Accept");
                 return;
             }
 
-            Settings.UserPassword = this.NewPassword;
-            await this.navigationService.Close(this);
+            Settings.UserPassword = NewPassword;
+            await _navigationService.Close(this);
         }
     }
 }

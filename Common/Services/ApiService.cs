@@ -1,4 +1,7 @@
-﻿
+﻿using System.Net;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+
 namespace Common.Services
 {
     using System;
@@ -114,8 +117,13 @@ namespace Common.Services
                 {
                     BaseAddress = new Uri(urlBase)
                 };
-
                 var url = $"{servicePrefix}{controller}";
+
+                var client1 = new RestClient(new Uri("https://localhost:44315/")); 
+                var request1 = new RestRequest(url, Method.POST) { Timeout = 5000 };
+                request1.AddJsonBody(request);
+                var response1 = client1.Execute(request1);
+
                 var response = await client.PostAsync(url, content);
                 var result = await response.Content.ReadAsStringAsync();
 
@@ -470,6 +478,41 @@ namespace Common.Services
                     Message = ex.Message,
                 };
             }
+        }
+
+        public async Task<Response> PostUserToAppAsync(
+            string urlBase,
+            string servicePrefix,
+            string controller,
+            SetUserToAppRequest setUserToAppRequest,
+            string tokenType,
+            string accessToken)
+        {
+            try
+            {
+                var request = JsonConvert.SerializeObject(setUserToAppRequest);
+                var content = new StringContent(request, Encoding.UTF8, "application/json");
+                var client = new HttpClient
+                {
+                    BaseAddress = new Uri(urlBase)
+                };
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(tokenType, accessToken);
+                var url = $"{servicePrefix}{controller}";
+                var response = await client.PostAsync(url, content);
+                var answer = await response.Content.ReadAsStringAsync();
+                var obj = JsonConvert.DeserializeObject<Response>(answer);
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+
         }
     }
 }

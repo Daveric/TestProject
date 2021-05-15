@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using MobileApp.Services;
+using MobileApp.Interfaces;
 using Xamarin.Forms;
 using ZXing.Mobile;
 

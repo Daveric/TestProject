@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MobileApp.Services
+namespace MobileApp.Interfaces
 {
     public interface IQrScanningService
     {
