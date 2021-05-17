@@ -133,7 +133,7 @@
     <value>Error</value>
   </data>
   <data name="Forgot" xml:space="preserve">
-    <value>Forgot my password</value>
+    <value>Forgot my password?</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Login</value>

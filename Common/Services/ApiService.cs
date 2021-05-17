@@ -119,6 +119,7 @@ namespace Common.Services
                 };
                 var url = $"{servicePrefix}{controller}";
 
+                //TODO: review
                 var client1 = new RestClient(new Uri("https://localhost:44315/")); 
                 var request1 = new RestRequest(url, Method.POST) { Timeout = 5000 };
                 request1.AddJsonBody(request);

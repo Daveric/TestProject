@@ -36,6 +36,7 @@ namespace WebAPI.Controllers.API
         }
         
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAll()
         {
             return Ok(_applicationRepository.GetAll().Include(app => app.User));

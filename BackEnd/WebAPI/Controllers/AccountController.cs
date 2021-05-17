@@ -69,9 +69,7 @@ namespace WebAPI.Controllers
 
         public IActionResult Register()
         {
-            var model = new RegisterNewUserViewModel();
-
-            return View(model);
+            return View();
         }
 
         [HttpPost]
@@ -108,7 +106,7 @@ namespace WebAPI.Controllers
 
                     _mailHelper.SendMail(model.Username, "Shop Email confirmation", $"<h1>Shop Email Confirmation</h1>" +
                         $"To allow the user, " +
-                        $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
                     ViewBag.Message = "The instructions to allow your user has been sent to email.";
                     return View(model);
                 }
@@ -199,6 +197,7 @@ namespace WebAPI.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
@@ -238,14 +237,14 @@ namespace WebAPI.Controllers
                 }
             }
 
-            return BadRequest();
+            return BadRequest(Unauthorized());
         }
 
         public IActionResult NotAuthorized()
         {
             return View();
         }
-        
+
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
@@ -334,7 +333,7 @@ namespace WebAPI.Controllers
                 var myUser = await _userHelper.GetUserByIdAsync(user.Id);
                 if (myUser == null) continue;
                 user.IsAdmin = await _userHelper.IsUserInRoleAsync(myUser, "Admin");
-                user.HasAccess = await _userHelper.IsUserInRoleAsync(myUser, "3AuthLevel");
+                user.HasAccess = await _userHelper.IsUserInRoleAsync(myUser, "ThirdAuthLevel");
             }
 
             return View(users);

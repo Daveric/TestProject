@@ -16,7 +16,7 @@ namespace DesktopApp
     public partial class MainWindow : Window
     {
         private const string ApplicationName = "Cambium1";
-        private static readonly RestClient Client = new RestClient(new Uri("https://localhost:44315/api/"));
+        private static readonly RestClient Client = new RestClient(new Uri("https://localhost:44315/api"));
 
         public MainWindow()
         {
@@ -36,7 +36,7 @@ namespace DesktopApp
         
         private static async Task<string> GetAccessValueAsync()
         {
-            var request = new RestRequest("Applications/GetAccess", Method.GET) {Timeout = 5000};
+            var request = new RestRequest("/Applications/GetAccess", Method.GET) {Timeout = 5000};
             request.AddQueryParameter("name", ApplicationName);
             var response = await Client.ExecuteAsync(request);
             if (!response.IsSuccessful)
@@ -56,7 +56,7 @@ namespace DesktopApp
         {
             try
             {
-                var request = new RestRequest("Applications/GetAppId", Method.GET) { Timeout = 3000 };
+                var request = new RestRequest("/Applications/GetAppId", Method.GET) { Timeout = 3000 };
                 request.AddQueryParameter("name", ApplicationName);
                 var response = await Client.ExecuteAsync(request);
                 if (response.StatusCode != HttpStatusCode.OK)

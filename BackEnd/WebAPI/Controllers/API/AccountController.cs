@@ -11,6 +11,7 @@ namespace WebAPI.Controllers.API
     using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[Controller]")]
+    [ApiController]
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
@@ -80,7 +81,7 @@ namespace WebAPI.Controllers.API
 
         [HttpPost]
         [Route("RecoverPassword")]
-        public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequest request)
+        public async Task<IActionResult> RecoverPasswordApi([FromBody] RecoverPasswordRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -155,7 +156,7 @@ namespace WebAPI.Controllers.API
                 return BadRequest("User not found.");
             }
 
-            
+
             userEntity.FirstName = user.FirstName;
             userEntity.LastName = user.LastName;
             userEntity.Address = user.Address;
@@ -174,7 +175,7 @@ namespace WebAPI.Controllers.API
         [HttpPost]
         [Route("ChangePassword")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        public async Task<IActionResult> ChangePasswordApi([FromBody] ChangePasswordRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -213,7 +214,7 @@ namespace WebAPI.Controllers.API
         }
 
         [HttpPost("AccessOn")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AccessToApplicationsOn([FromQuery] string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);
@@ -232,7 +233,7 @@ namespace WebAPI.Controllers.API
         }
 
         [HttpPost("AccessOff")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AccessToApplicationsOff([FromQuery] string email)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);

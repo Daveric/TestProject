@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebAPI.Data;
 using WebAPI.Data.Entities;
 using WebAPI.Data.Repositories;
 using WebAPI.Helper;
 
 namespace WebAPI.Controllers
 {
+    [Authorize]
     public class ApplicationsController : Controller
     {
         private readonly IApplicationRepository _applicationRepository;
@@ -32,13 +32,13 @@ namespace WebAPI.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             return View(application);
@@ -73,13 +73,13 @@ namespace WebAPI.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
             return View(application);
         }
@@ -93,7 +93,7 @@ namespace WebAPI.Controllers
         {
             if (id != application.Id)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             if (ModelState.IsValid)
@@ -107,12 +107,10 @@ namespace WebAPI.Controllers
                 {
                     if (!await _applicationRepository.ExistAsync(application.Id))
                     {
-                        return NotFound();
+                        return new NotFoundViewResult("ApplicationNotFound");
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -125,13 +123,13 @@ namespace WebAPI.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             var application = await _applicationRepository.GetByIdAsync(id.Value);
             if (application == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ApplicationNotFound");
             }
 
             return View(application);
@@ -147,5 +145,10 @@ namespace WebAPI.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        public IActionResult ApplicationNotFound()
+        {
+            return View();
+        }
     }
 }

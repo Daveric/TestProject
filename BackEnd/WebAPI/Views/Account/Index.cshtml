@@ -4,9 +4,6 @@
     ViewData["Title"] = "Index";
 }
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
-<br />
-
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -36,6 +33,9 @@
                                 @Html.DisplayNameFor(model => model.IsAdmin)
                             </th>
                             <th>
+                                @Html.DisplayNameFor(model => model.HasAccess)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.EmailConfirmed)
                             </th>
                             <th></th>
@@ -44,40 +44,43 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.FirstName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.LastName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Email)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Address)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.IsAdmin)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
-                                </td>
-                                <td>
-                                    <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Delete</button>
-                                    @if (item.IsAdmin)
-                                    {
-                                        <a asp-action="AdminOff" asp-route-id="@item.Id" class="btn btn-warning">Admin Off</a>
-                                    }
-                                    else
-                                    {
-                                        <a asp-action="AdminOn" asp-route-id="@item.Id" class="btn btn-primary">Admin On</a>
-                                    }
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FirstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Address)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsAdmin)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.HasAccess)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                            </td>
+                            <td>
+                                <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Delete</button>
+                                @if (item.IsAdmin)
+                                {
+                                    <a asp-action="AdminOff" asp-route-id="@item.Id" class="btn btn-warning">Admin Off</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="AdminOn" asp-route-id="@item.Id" class="btn btn-primary">Admin On</a>
+                                }
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>
@@ -108,7 +111,6 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#UsersTable').DataTable();
