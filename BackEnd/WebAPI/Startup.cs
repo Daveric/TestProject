@@ -45,7 +45,7 @@ namespace WebAPI
                 .AddEntityFrameworkStores<DataContext>();
 
             services.AddAuthentication()
-                //.AddCookie()
+                .AddCookie()
                 .AddJwtBearer(cfg =>
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters

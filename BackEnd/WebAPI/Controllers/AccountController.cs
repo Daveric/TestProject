@@ -97,17 +97,33 @@ namespace WebAPI.Controllers
                         return View(model);
                     }
 
-                    var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    var tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    var loginViewModel = new LoginViewModel
                     {
-                        userid = user.Id,
-                        token = myToken
-                    }, protocol: HttpContext.Request.Scheme);
+                        Password = model.Password,
+                        RememberMe = false,
+                        Username = model.Username
+                    };
 
-                    _mailHelper.SendMail(model.Username, "Shop Email confirmation", $"<h1>Shop Email Confirmation</h1>" +
-                        $"To allow the user, " +
-                        $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
-                    ViewBag.Message = "The instructions to allow your user has been sent to email.";
+                    var result2 = await _userHelper.LoginAsync(loginViewModel);
+                    if (result2.Succeeded)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    ModelState.AddModelError(String.Empty, "The user couldn't login.");
+
+                    // Email confirmation commented
+                    //var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    //var tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    //{
+                    //    userid = user.Id,
+                    //    token = myToken
+                    //}, protocol: HttpContext.Request.Scheme);
+
+                    //_mailHelper.SendMail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                    //    $"To allow the user, " +
+                    //    $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+                    //ViewBag.Message = "The instructions to allow your user has been sent to email.";
+
                     return View(model);
                 }
 

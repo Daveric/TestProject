@@ -52,7 +52,8 @@ namespace WebAPI.Controllers.API
                 Email = request.Email,
                 UserName = request.Email,
                 Address = request.Address,
-                PhoneNumber = request.Phone
+                PhoneNumber = request.Phone,
+                EmailConfirmed = true
             };
 
             var result = await _userHelper.AddUserAsync(user, request.Password);
@@ -60,23 +61,26 @@ namespace WebAPI.Controllers.API
             {
                 return BadRequest(result.Errors.FirstOrDefault()?.Description);
             }
+            
+            return Ok();
 
-            var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-            var tokenLink = Url.Action("ConfirmEmail", "Account", new
-            {
-                userid = user.Id,
-                token = myToken
-            }, protocol: HttpContext.Request.Scheme);
+            // Email confirmation commented
+            //var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            //var tokenLink = Url.Action("ConfirmEmail", "Account", new
+            //{
+            //    userid = user.Id,
+            //    token = myToken
+            //}, protocol: HttpContext.Request.Scheme);
 
-            _mailHelper.SendMail(request.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                $"To allow the user, " +
-                $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+            //_mailHelper.SendMail(request.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+            //    $"To allow the user, " +
+            //    $"please click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
 
-            return Ok(new Response
-            {
-                IsSuccess = true,
-                Message = "A Confirmation email was sent. Please confirm your account and log into the App."
-            });
+            //return Ok(new Response
+            //{
+            //    IsSuccess = true,
+            //    Message = "A Confirmation email was sent. Please confirm your account and log into the App."
+            //});
         }
 
         [HttpPost]
