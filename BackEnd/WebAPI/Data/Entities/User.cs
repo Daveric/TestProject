@@ -26,7 +26,8 @@ namespace WebAPI.Data.Entities
         [NotMapped]
         [Display(Name = "Is Admin?")]
         public bool IsAdmin { get; set; }
-
+        
+        [NotMapped]
         [Display(Name = "Access to Applications")]
         public bool HasAccess { get; set; }
 

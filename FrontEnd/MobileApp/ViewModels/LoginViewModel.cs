@@ -81,7 +81,7 @@ namespace MobileApp.ViewModels
             var url = Xamarin.Forms.Application.Current.Resources["UrlAPI"].ToString();
             var response = await _apiService.GetTokenAsync(
                 url,
-                "Account",
+                "/Account",
                 "/CreateToken",
                 request);
 

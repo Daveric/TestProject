@@ -303,7 +303,7 @@ namespace WebAPI.Controllers
                 var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
                 var link = Url.Action("ResetPassword", "Account", new { token = myToken }, protocol: HttpContext.Request.Scheme);
                 var mailSender = new MailHelper(_configuration);
-                mailSender.SendMail(model.Email, subject: "Shop Password Reset", body: $"<h1>Shop Recover Password</h1>" +
+                mailSender.SendMail(model.Email, subject: "Password Reset", body: $"<h1>Recover Password</h1>" +
                     $"To reset the password click in this link:</br></br>" +
                     $"<a href = \"{link}\">Reset Password</a>");
                 ViewBag.Message = "The instructions to recover your password has been sent to email.";

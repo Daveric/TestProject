@@ -227,11 +227,10 @@ namespace WebAPI.Controllers.API
                 return BadRequest("User not found.");
             }
             await _userHelper.AddUserToRoleAsync(user, "ThirdAuthLevel");
-            user.HasAccess = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
-            var response = await _userHelper.UpdateUserAsync(user);
-            if (!response.Succeeded)
+            var response = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
+            if (!response)
             {
-                return BadRequest(response.Errors.FirstOrDefault()?.Description);
+                return BadRequest("Role not assigned to user");
             }
             return Ok();
         }
@@ -246,11 +245,10 @@ namespace WebAPI.Controllers.API
                 return BadRequest("User not found.");
             }
             await _userHelper.RemoveUserFromRoleAsync(user, "ThirdAuthLevel");
-            user.HasAccess = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
-            var response = await _userHelper.UpdateUserAsync(user);
-            if (!response.Succeeded)
+            var response = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
+            if (response)
             {
-                return BadRequest(response.Errors.FirstOrDefault()?.Description);
+                return BadRequest("Role not deleted from user");
             }
             return Ok();
         }

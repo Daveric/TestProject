@@ -1,17 +1,14 @@
-﻿using System.Net;
-using Newtonsoft.Json.Linq;
-using RestSharp;
-
+﻿
 namespace Common.Services
 {
     using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using Models;
-    using Newtonsoft.Json;
     using System.Threading.Tasks;
     using System.Net.Http.Headers;
     using System.Text;
+    using Newtonsoft.Json;
 
     public class ApiService : IApiService
     {
@@ -118,13 +115,6 @@ namespace Common.Services
                     BaseAddress = new Uri(urlBase)
                 };
                 var url = $"{servicePrefix}{controller}";
-
-                //TODO: review
-                var client1 = new RestClient(new Uri("https://localhost:44315/")); 
-                var request1 = new RestRequest(url, Method.POST) { Timeout = 5000 };
-                request1.AddJsonBody(request);
-                var response1 = client1.Execute(request1);
-
                 var response = await client.PostAsync(url, content);
                 var result = await response.Content.ReadAsStringAsync();
 

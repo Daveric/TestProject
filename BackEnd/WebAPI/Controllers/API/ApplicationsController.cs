@@ -32,7 +32,9 @@ namespace WebAPI.Controllers.API
         [HttpGet("[action]")]
         public async Task<IActionResult> GetAccess([FromQuery] string name)
         {
-            return Ok(await _applicationRepository.GetApplicationAccessAsync(name));
+            var user = await _applicationRepository.GetUserByApplicationName(name);
+            var hasAccess = await _userHelper.IsUserInRoleAsync(user, "ThirdAuthLevel");
+            return Ok(hasAccess);
         }
         
         [HttpGet]

@@ -58,9 +58,6 @@ namespace Common.Models
         
         [JsonProperty("address")]
         public string Address { get; set; }
-
-        [JsonProperty("hasAccess")]
-        public string HasAccess { get; set; }
-
+        
     }
 }

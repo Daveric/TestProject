@@ -7,7 +7,7 @@ namespace WebAPI.Data.Repositories
 
     public interface IApplicationRepository : IGenericRepository<Application>
     {
-        Task<bool> GetApplicationAccessAsync(string name);
+        Task<User> GetUserByApplicationName(string name);
 
         Task<Guid> GetGuidByApplicationName(string name);
         

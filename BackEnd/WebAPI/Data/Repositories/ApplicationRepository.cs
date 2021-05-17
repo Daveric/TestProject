@@ -15,12 +15,11 @@ namespace WebAPI.Data.Repositories
             _context = context;
         }
 
-        public async Task<bool> GetApplicationAccessAsync(string name)
+        public async Task<User> GetUserByApplicationName(string name)
         {
-            if (_context.Applications == null) return false;
+            if (_context.Applications == null) return null;
             var app = await _context.Applications.Include(a=>a.User).FirstOrDefaultAsync(a => a.Name == name);
-            var userHasAccess = app.User?.HasAccess;
-            return userHasAccess != null && (bool)userHasAccess;
+            return app.User;
         }
 
         public async Task<Guid> GetGuidByApplicationName(string name)

@@ -16,7 +16,7 @@ namespace DesktopApp
     public partial class MainWindow : Window
     {
         private const string ApplicationName = "Cambium1";
-        private static readonly RestClient Client = new RestClient(new Uri("https://localhost:44315/api"));
+        private static readonly RestClient Client = new RestClient("https://localhost:44315/api");
 
         public MainWindow()
         {
