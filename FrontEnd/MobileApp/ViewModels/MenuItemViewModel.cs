@@ -21,8 +21,8 @@ namespace MobileApp.ViewModels
                 case "AboutPage":
                     await App.Navigator.PushAsync(new AboutPage());
                     break;
-                case "ScanQRCodePage":
-                    await App.Navigator.PushAsync(new ScanQRCodePage());
+                case "ScanResultPage":
+                    await App.Navigator.PushAsync(new ScanResultPage());
                     break;
                 case "ProfilePage":
                     mainViewModel.Profile = new ProfileViewModel();
@@ -36,7 +36,7 @@ namespace MobileApp.ViewModels
                     Settings.UserPassword = string.Empty;
 
                     MainViewModel.GetInstance().Login = new LoginViewModel();
-                    Xamarin.Forms.Application.Current.MainPage = new NavigationPage(new LoginPage());
+                    Application.Current.MainPage = new NavigationPage(new LoginPage());
                     break;
             }
         }

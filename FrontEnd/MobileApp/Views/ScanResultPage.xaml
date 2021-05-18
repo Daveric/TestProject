@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MobileApp.Views.ScanResultPage" 
+             BindingContext="{Binding Main, Source={StaticResource Locator}}"
+             Title="Scan QRCode">
+  <ContentPage.Content>
+    <StackLayout Padding="8" BindingContext="{Binding Scan}">
+      <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
+        <Label Text="Please hit the button to scan" HorizontalTextAlignment="Center"/>
+        <Button Text="Scan" Command="{Binding ScanCommand}" VerticalOptions="EndAndExpand"/>
+      </Grid>
+    </StackLayout>
+  </ContentPage.Content>
+</ContentPage>

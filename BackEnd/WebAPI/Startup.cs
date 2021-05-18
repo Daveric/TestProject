@@ -56,8 +56,11 @@ namespace WebAPI
                             Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
                     };
                 });
+            services.AddDbContext<DataContext>(options =>
+            {
+                options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
-            services.AddDbContext<DataContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<SeedDb>();
             services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<IUserHelper, UserHelper>();

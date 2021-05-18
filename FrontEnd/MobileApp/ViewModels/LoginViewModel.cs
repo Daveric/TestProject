@@ -5,10 +5,8 @@ using Common.Models;
 using Common.Services;
 using GalaSoft.MvvmLight.Command;
 using MobileApp.Helper;
-using MobileApp.Properties;
 using MobileApp.Views;
 using Newtonsoft.Json;
-using Xamarin.Forms;
 
 namespace MobileApp.ViewModels
 {

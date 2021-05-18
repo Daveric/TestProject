@@ -60,7 +60,7 @@ namespace MobileApp.ViewModels
                 new Menu
                 {
                     Icon = "ic_phonelink_setup",
-                    PageName = "ScanQRCodePage",
+                    PageName = "ScanResultPage",
                     Title = "Scan QRCode"
                 },
 

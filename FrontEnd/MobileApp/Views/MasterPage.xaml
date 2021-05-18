@@ -9,7 +9,7 @@
     <FlyoutPage.Detail>
         <NavigationPage x:Name="Navigator">
             <x:Arguments>
-                <pages:ScanQRCodePage />
+              <pages:ScanResultPage />
             </x:Arguments>
         </NavigationPage>
     </FlyoutPage.Detail>

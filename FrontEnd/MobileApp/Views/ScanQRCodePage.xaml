@@ -1,13 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:forms="clr-namespace:ZXing.Net.Mobile.Forms;assembly=ZXing.Net.Mobile.Forms"
              x:Class="MobileApp.Views.ScanQRCodePage" 
              BindingContext="{Binding Main, Source={StaticResource Locator}}"
              Title="Scan QRCode">
     <ContentPage.Content>
         <StackLayout Padding="8" BindingContext="{Binding Scan}">
-            <Label Text="Please Scan the QRCode" HorizontalTextAlignment="Center"/>
-            <Button Text="Scan" Command="{Binding ScanCommand}" VerticalOptions="EndAndExpand"/>
+          <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
+            <forms:ZXingScannerView IsScanning="{Binding IsScanning}" IsAnalyzing="{Binding IsAnalyzing}" ScanResultCommand="{Binding ScanResultCommand}"
+                                    Result="{Binding Result, Mode=TwoWay}"/>
+            <forms:ZXingDefaultOverlay TopText="Hold up the code to Scan" BottomText="Scanning will happen Automatically" 
+                                       ShowFlashButton="False" Opacity="0.9"/>
+          </Grid>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
