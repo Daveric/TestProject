@@ -16,7 +16,7 @@
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Content="QR Code" Margin="0,0,0,-5" FontFamily="Segoe Ui" />
-            <Image Grid.Row="1" x:Name="QrCodeImage" Margin="5" Binding.SourceUpdated="ShowQrCode_OnClick"/>
+            <Image Grid.Row="1" x:Name="QrCodeImage" Margin="5" Binding.SourceUpdated="StartListening"/>
         </Grid>
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
@@ -26,7 +26,8 @@
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Content="Info" Margin="0,0,0,-5" FontFamily="Segoe Ui" />
             <TextBox Grid.Row="1" x:Name="InfoText" TextWrapping="Wrap" Margin="5" FontFamily="Segoe Ui" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-            <Button Grid.Row="2" x:Name="ShowQrCode" Content="Apply" HorizontalAlignment="Left" Padding="5" Click="ShowQrCode_OnClick" Margin="5" Height="40" Width="100" FontFamily="Segoe Ui"/>
-        </Grid>
+            <Button Grid.Row="2" Content="Start Listening" HorizontalAlignment="Left" Padding="5" Click="StartListening" Margin="5" Height="40" Width="100" FontFamily="Segoe Ui"/>
+            <Button Grid.Row="2" Content="Cancel" HorizontalAlignment="Right" Padding="5" Click="Stop" Margin="5" Height="40" Width="100" FontFamily="Segoe Ui"/>
+    </Grid>
     </Grid>
 </Window>
